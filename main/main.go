@@ -1,6 +1,13 @@
 package main
 
-import "github.com/nlopes/slack"
+import (
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/nlopes/slack"
+)
 
 func main() {
 	token := getenv("SLACK_TOKEN")
@@ -8,5 +15,22 @@ func main() {
 	rtm := api.NewRTM()
 
 	go rtm.ManageConnection()
-	beBot(rtm)
+	go beBot(rtm)
+
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
+
+	router := gin.New()
+	router.Use(gin.Logger())
+	router.LoadHTMLGlob("templates/*.tmpl.html")
+	router.Static("/static", "static")
+
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.tmpl.html", nil)
+	})
+
+	router.Run(":" + port)
 }
