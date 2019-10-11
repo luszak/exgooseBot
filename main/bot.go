@@ -21,10 +21,15 @@ func handleRequest(rtm *slack.RTM, ev *slack.MessageEvent) {
 	text := ev.Text
 	text = strings.TrimSpace(text)
 	text = strings.ToLower(text)
+
 	match, _ := regexp.MatchString("!excuse", text)
+	spanko_mode, _ := regexp.MatchString("!excuse spanko", text)
 
 	if ev.User != info.User.ID && match {
-		excuse := GetExcuse()
+		excuse := ":nie-moge-mam-spanko:"
+		if !spanko_mode {
+			excuse = GetExcuse()
+		}
 		rtm.SendMessage(rtm.NewOutgoingMessage(excuse, ev.Channel, slack.RTMsgOptionTS(ev.ThreadTimestamp)))
 		println("Sent: '" + excuse + "' to " + ev.Channel)
 	}

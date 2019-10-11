@@ -1,9 +1,7 @@
 package main
 
 import (
-	"log"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nlopes/slack"
@@ -17,11 +15,7 @@ func main() {
 	go rtm.ManageConnection()
 	go beBot(rtm)
 
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		log.Fatal("$PORT must be set")
-	}
+	port := getenv("PORT")
 
 	router := gin.New()
 	router.Use(gin.Logger())
